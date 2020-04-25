@@ -1,0 +1,8 @@
+.venv
+*.pyc
+tmp/
+__pycache__
+build/
+dist/
+mglib.egg-info/
+*.config.py
