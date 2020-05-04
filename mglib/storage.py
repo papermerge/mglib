@@ -1,23 +1,9 @@
 import os
 import logging
 import shutil
+from mglib.utils import safe_to_delete
 
 logger = logging.getLogger(__name__)
-
-
-def safe_to_delete(place, safe_extensions):
-    if not os.path.exists(place):
-        logging.warning(
-            f"Trying to delete not exising folder"
-            f" {place}"
-        )
-        return False
-
-    for root, dirs, files in os.walk(place):
-        for name in files:
-            print(name)
-
-    return False
 
 
 class Storage:
@@ -57,16 +43,18 @@ class Storage:
         # double check that there are only
         # .pdf, .txt, .hocr, .jpg files.
         if safe_to_delete(
-            abs_dirname_docs,
-            safe_extensions=['pdf']
+            abs_dirname_docs
         ):
             shutil.rmtree(abs_dirname_docs)
+            if os.path.exists(abs_dirname_docs):
+                os.rmdir(abs_dirname_docs)
 
         if safe_to_delete(
-            abs_dirname_results,
-            safe_extensions=['txt', 'jpg', 'hocr']
+            abs_dirname_results
         ):
             shutil.rmtree(abs_dirname_results)
+            if os.path.exists(abs_dirname_results):
+                os.rmdir(abs_dirname_results)
 
     def exists(self, _path):
         return os.path.exists(

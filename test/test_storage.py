@@ -31,13 +31,13 @@ class TestStorage(unittest.TestCase):
                 file_name='doku.pdf'
             )
 
+            self.assertTrue(
+                f1.exists()
+            )
+
             storage.delete_document(doc_path)
 
             self.assertFalse(
-                docs.exists()
-            )
-
-            self.assertFalse(
-                res.exists()
+                f1.exists()
             )
 

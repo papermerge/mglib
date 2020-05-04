@@ -1,4 +1,5 @@
 import os
+import shutil
 
 
 class TemporaryNode:
@@ -41,14 +42,14 @@ class TemporaryNode:
 
     def __enter__(self):
         if not os.path.exists(self.location):
-            os.makedirs(self.location)
+            os.makedirs(self.location, exist_ok=True)
 
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         if os.path.exists(self.location):
             if os.path.isdir(self.location):
-                os.rmdir(self.location)
+                shutil.rmtree(self.location)
             else:
                 os.remove(self.location)
 
@@ -57,12 +58,11 @@ class TemporaryNode:
             self.location,
             folder
         )
-        os.makedirs(new_location)
+        os.makedirs(new_location, exist_ok=True)
         return TemporaryNode(new_location)
 
     def exists(self):
         return os.path.exists(self.location)
 
     def add_file(self, file):
-        pass
         return self
