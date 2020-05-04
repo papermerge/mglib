@@ -1,5 +1,5 @@
 import unittest
-from pmworker.step import Step
+from mglib.step import Step
 
 
 class TestStep(unittest.TestCase):
