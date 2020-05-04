@@ -19,23 +19,6 @@ class TestDocumentPath(unittest.TestCase):
             "docs/user_1/document_3/x.pdf"
         )
 
-    def test_empty_tenant(self):
-        """
-        With no tenant specified - url to document will
-        be without tenant.
-        """
-        doc_ep = DocumentPath(
-            remote_endpoint=self.remote_ep,
-            local_endpoint=self.local_ep,
-            user_id=1,
-            document_id=3,
-            file_name="x.pdf"
-        )
-        self.assertEqual(
-            doc_ep.url(),
-            "/var/media/docs/user_1/document_3/x.pdf"
-        )
-
     def test_inc_version(self):
         """
         Document endpoints are now versioned.
@@ -55,7 +38,7 @@ class TestDocumentPath(unittest.TestCase):
 
         self.assertEqual(
             doc_ep.url(),
-            "/var/media/docs/user_1/document_3/v1/x.pdf"
+            "docs/user_1/document_3/v1/x.pdf"
         )
 
         doc_ep.inc_version()

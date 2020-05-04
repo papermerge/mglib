@@ -6,3 +6,8 @@ Python Package containing modules shared across all [Papermerge Project](https:/
 ## Installation
 
     pip install mglib
+
+
+## Run tests
+
+    python test/run.py

@@ -3,7 +3,7 @@ import os
 
 class Storage:
     """
-    Storage class which works with Endpointsf
+    Storage class which works with DocumentPath and PagePath
     """
 
     def __init__(self, location=None):
@@ -13,18 +13,21 @@ class Storage:
     def location(self):
         return self._location
 
-    def path_doc(self, ep):
+    def path(self, _path):
         return os.path.join(
-            self.location,
-            ep.path_doc
+            self.location, _path
         )
 
-    def path_result(self, ep):
-        return os.path.join(
-            self.location, ep.path_result
-        )
-
-    def delete(self, ep):
+    def delete_document(self, doc_path):
+        """
+        Receives a mglib.path.DocumentPath instance
+        """
         pass
+
+    def exists(self, _path):
+        return os.path.exists(
+            self.path(_path)
+        )
+
 
 

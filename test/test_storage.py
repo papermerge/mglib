@@ -8,9 +8,9 @@ class TestStep(unittest.TestCase):
     def test_basic(self):
         storage = Storage()
 
-        ep = DocumentPath(
+        docp = DocumentPath(
             user_id=1,
             document_id=2,
             file_name='doku.pdf'
         )
-        storage.delete(ep)
+        storage.delete_document(docp)

@@ -1,7 +1,5 @@
 import os
 import logging
-import boto3
-from botocore.errorfactory import ClientError
 
 
 logger = logging.getLogger(__name__)
@@ -10,115 +8,9 @@ AUX_DIR_DOCS = "docs"
 AUX_DIR_RESULTS = "results"
 
 
-def get_keyname(s3_url):
-    """
-    Extracts key part from s3 URL:
-        s3_url = s3://my-bucket/some/path/to/x.pdf
-        result = some/path/to/x.pdf
-    """
-    s3 = s3_url.replace('//', '/')
-    scheme, bucket, *rest = s3.split('/')
-    return '/'.join(rest)
-
-
-def get_bucketname(s3_url):
-    """
-    Extracts key part from s3 URL:
-        s3_url = s3://my-bucket/some/path/to/x.pdf
-        result = my-bucket
-    """
-    s3 = s3_url.replace('//', '/')
-    scheme, bucket, *rest = s3.split('/')
-    return bucket
-
-
-def s3_key_exists(endpoint_url):
-    bucketname = get_bucketname(endpoint_url)
-    keyname = get_keyname(endpoint_url)
-    s3_client = boto3.client('s3')
-
-    try:
-        s3_client.head_object(Bucket=bucketname, Key=keyname)
-    except ClientError:
-        logger.debug(f"Endpoint s3:/{bucketname}/{keyname} does not exist.")
-        return False
-
-    return True
-
-
-class Endpoint:
-    """
-    Endpoint is a either remote or local root storage
-    from/to where files are downloaded/uploaded.
-
-    In case of S3 storage:
-
-        ep_root = Endpoint("s3:/my-bucket")
-        ep_root.bucketname == 'my-bucket'
-
-    In case of local storage:
-
-        ep_root = Endpoint("local:/var/media/files")
-        ep_root.dirname == '/var/media/files'
-    """
-    S3 = 's3'
-    LOCAL = 'local'
-
-    def __init__(self, url):
-        if not url or len(url) < 1:
-            raise ValueError("Invalid url")
-
-        self.url = url
-        self.local_tmp_ref = None
-
-    @property
-    def is_s3(self):
-        return self.scheme == Endpoint.S3
-
-    @property
-    def scheme(self):
-        if ":" in self.url:
-            s, path = self.url.split(':')
-        else:
-            s = Endpoint.LOCAL
-
-        return s
-
-    @property
-    def is_local(self):
-        return self.scheme == Endpoint.LOCAL
-
-    @property
-    def bucketname(self):
-        # First part is scheme, then bucket name.
-        if not self.is_s3:
-            raise ValueError("How come? Bucketname applies only to S3.")
-
-        return self.url.split('/')[1]
-
-    @property
-    def dirname(self):
-        if not self.is_local:
-            raise ValueError("How come? dirname applies only to local.")
-
-        parts = self.url.split('/')[1:]
-        joined = '/'.join(parts)
-
-        if self.url.endswith('/'):
-            return f"/{joined}"
-        else:
-            return f"/{joined}/"
-
-    def __str__(self):
-        return "Endpoint(%s)" % self.url
-
-    def __repr__(self):
-        return "Endpoint(%s)" % self.url
-
-
 class DocumentPath:
     """
-    Document Endpoint path:
+    Document path:
     /<aux_dir>/<user_id>/<doc_id>/<version>/<file_name>
 
     If version = 0, it is not included in Endpoint.
@@ -142,18 +34,12 @@ class DocumentPath:
         self.version = version
         self.pages = "pages"
 
-    def url(self, ep=Endpoint.LOCAL):
-        full_path = None
+    def url(self):
+        return f"{self.dirname}{self.file_name}"
 
-        if ep == Endpoint.S3:
-            full_path = (
-                f"s3:/{self.bucketname}/"
-                f"{self.key}"
-            )
-        else:
-            full_path = f"{self.dirname}{self.file_name}"
-
-        return full_path
+    @property
+    def path(self):
+        return self.url()
 
     @property
     def dirname_docs(self):
@@ -189,31 +75,9 @@ class DocumentPath:
     def pages_dirname(self):
         return f"{self.dirname}{self.pages}/"
 
-    @property
-    def bucketname(self):
-        return self.remote_endpoint.bucketname
-
-    @property
-    def key(self):
-        root_dir = f"{self.aux_dir}"
-
-        full_path = (
-            f"{root_dir}/user_{self.user_id}/"
-            f"document_{self.document_id}/"
-        )
-
-        if self.version > 0:
-            full_path = f"{full_path}v{self.version}/{self.file_name}"
-        else:
-            full_path = f"{full_path}{self.file_name}"
-
-        return full_path
-
     def __repr__(self):
         message = (
             f"DocumentPath(version={self.version},"
-            f"remote_endpoint={self.remote_endpoint},"
-            f"local_endpoint={self.local_endpoint},"
             f"user_id={self.user_id},"
             f"document_id={self.document_id},"
             f"file_name={self.file_name})"
@@ -222,16 +86,6 @@ class DocumentPath:
 
     def inc_version(self):
         self.version = self.version + 1
-
-    def exists(self, ep=Endpoint.LOCAL):
-        result = False
-
-        if ep == Endpoint.LOCAL:
-            result = os.path.exists(self.url(ep=Endpoint.LOCAL))
-        else:
-            result = s3_key_exists(self.url(ep=Endpoint.S3))
-
-        return result
 
     def copy_from(doc_ep, aux_dir):
         return DocumentPath(
@@ -245,7 +99,7 @@ class DocumentPath:
 
 class PagePath:
     """
-    schema://.../<doc_id>/pages/<page_num>/<step>/page-<xyz>.jpg
+    <aux_dir>/<doc_id>/pages/<page_num>/<step>/page-<xyz>.jpg
     """
 
     def __init__(
@@ -283,74 +137,36 @@ class PagePath:
     def pages_dirname(self):
         return self.document_ep.pages_dirname
 
-    def exists(self, ep=Endpoint.LOCAL):
-        return self.txt_exists(ep)
+    @property
+    def path(self):
+        return self.url()
 
-    def url(self, ep=Endpoint.LOCAL):
-        return self.txt_url(ep)
-
-    def txt_url(self, ep=Endpoint.LOCAL):
-        result = None
-
-        if ep == Endpoint.LOCAL:
-            pages_dirname = self.results_document_ep.pages_dirname
-            result = f"{pages_dirname}page_{self.page_num}.txt"
-        else:
-            aux_dir = self.results_document_ep.aux_dir
-            user_id = self.results_document_ep.user_id
-            document_id = self.results_document_ep.document_id
-
-            result = (
-                f"s3:/{self.results_document_ep.remote_endpoint.bucketname}/"
-                f"{aux_dir}/user_{user_id}/"
-                f"document_{document_id}/{self.pages}/page_{self.page_num}.txt"
-            )
-
-        return result
-
-    def txt_exists(self, ep=Endpoint.LOCAL):
-        result = False
-
-        if ep == Endpoint.LOCAL:
-            result = os.path.exists(self.txt_url(ep=ep))
-        else:
-            result = s3_key_exists(self.txt_url(ep=Endpoint.S3))
-
-        return result
+    def url(self):
+        return self.txt_url()
 
     @property
-    def bucketname(self):
-        return self.results_document_ep.remote_endpoint.bucketname
+    def txt_path(self):
+        return self.txt_url()
 
-    def hocr_url(self, ep=Endpoint.LOCAL):
-        url = None
-        if ep == Endpoint.LOCAL:
-            url = f"{self.ppmroot}-{self.ppmtopdf_formated_number}.hocr"
-        else:
-            aux_dir = self.results_document_ep.aux_dir
-            user_id = self.results_document_ep.user_id
-            document_id = self.results_document_ep.document_id
+    def txt_url(self):
+        pages_dirname = self.results_document_ep.pages_dirname
+        return f"{pages_dirname}page_{self.page_num}.txt"
 
-            url = (
-                f"s3:/{self.results_document_ep.remote_endpoint.bucketname}/"
-                f"{aux_dir}/user_{user_id}/"
-                f"document_{document_id}/{self.pages}/page_{self.page_num}/"
-                f"{self.step.percent}/"
-                f"page-{self.ppmtopdf_formated_number}.hocr"
-            )
+    @property
+    def hocr_path(self):
+        return self.hocr_url()
 
+    def hocr_url(self):
+        url = f"{self.ppmroot}-{self.ppmtopdf_formated_number}.hocr"
         return url
 
-    def hocr_exists(self, ep=Endpoint.LOCAL):
-        result = False
+    @property
+    def img_path(self):
+        return self.img_url()
 
-        if ep == Endpoint.LOCAL:
-            result = os.path.exists(self.hocr_url(ep=ep))
-        elif ep == Endpoint.S3:
-            endpoint_url = self.hocr_url(ep=Endpoint.S3)
-            result = s3_key_exists(endpoint_url)
-
-        return result
+    def img_url(self):
+        url = f"{self.ppmroot}-{self.ppmtopdf_formated_number}.jpg"
+        return url
 
     @property
     def ppmtopdf_formated_number(self):
@@ -365,29 +181,3 @@ class PagePath:
         return fmt_num.format(
             num=int(self.page_num)
         )
-
-    def img_exists(self, ep=Endpoint.LOCAL):
-        result = False
-
-        if ep == Endpoint.LOCAL:
-            result = os.path.exists(self.img_url(ep=ep))
-
-        return result
-
-    def img_url(self, ep=Endpoint.LOCAL):
-        url = None
-        if ep == Endpoint.LOCAL:
-            url = f"{self.ppmroot}-{self.ppmtopdf_formated_number}.jpg"
-        else:
-            aux_dir = self.results_document_ep.aux_dir
-            user_id = self.results_document_ep.user_id
-            document_id = self.results_document_ep.document_id
-            url = (
-                f"s3:/{self.results_document_ep.remote_endpoint.bucketname}/"
-                f"{aux_dir}/user_{user_id}/"
-                f"document_{document_id}/{self.pages}/page_{self.page_num}/"
-                f"{self.step.percent}/"
-                f"page-{self.ppmtopdf_formated_number}.jpg"
-            )
-
-        return url
