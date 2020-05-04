@@ -1,6 +1,4 @@
-import os
 import logging
-
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +11,7 @@ class DocumentPath:
     Document path:
     /<aux_dir>/<user_id>/<doc_id>/<version>/<file_name>
 
-    If version = 0, it is not included in Endpoint.
+    If version = 0, it is not included in DocumentPath.
     Document's version is incremented everytime pdftk operation runs on it
     (when pages are deleted, reordered, pasted)
     """
