@@ -45,9 +45,9 @@ class TemporaryNode:
 
         return self
 
-    def __exit__(self):
+    def __exit__(self, exc_type, exc_value, traceback):
         if os.path.exists(self.location):
-            if os.path.is_dir(self.location):
+            if os.path.isdir(self.location):
                 os.rmdir(self.location)
             else:
                 os.remove(self.location)
