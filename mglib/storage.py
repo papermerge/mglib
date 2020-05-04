@@ -1,11 +1,23 @@
 import os
+import logging
 import shutil
+
+logger = logging.getLogger(__name__)
 
 
 def safe_to_delete(place, safe_extensions):
-    raise Exception(
-        "Trying to recursively delete unsafe path"
-    )
+    if not os.path.exists(place):
+        logging.warning(
+            f"Trying to delete not exising folder"
+            f" {place}"
+        )
+        return False
+
+    for root, dirs, files in os.walk(place):
+        for name in files:
+            print(name)
+
+    return False
 
 
 class Storage:
@@ -39,7 +51,7 @@ class Storage:
         # where OCRed information and generated thumbnails
         # are stored
         abs_dirname_results = self.path(
-            doc_path.abs_dirname_results
+            doc_path.dirname_results
         )
         # Before recursively deleting everything in folder
         # double check that there are only
