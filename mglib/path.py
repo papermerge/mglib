@@ -116,7 +116,7 @@ class Endpoint:
         return "Endpoint(%s)" % self.url
 
 
-class DocumentEp:
+class DocumentPath:
     """
     Document Endpoint path:
     /<aux_dir>/<user_id>/<doc_id>/<version>/<file_name>
@@ -211,7 +211,7 @@ class DocumentEp:
 
     def __repr__(self):
         message = (
-            f"DocumentEp(version={self.version},"
+            f"DocumentPath(version={self.version},"
             f"remote_endpoint={self.remote_endpoint},"
             f"local_endpoint={self.local_endpoint},"
             f"user_id={self.user_id},"
@@ -234,7 +234,7 @@ class DocumentEp:
         return result
 
     def copy_from(doc_ep, aux_dir):
-        return DocumentEp(
+        return DocumentPath(
             user_id=doc_ep.user_id,
             document_id=doc_ep.document_id,
             file_name=doc_ep.file_name,
@@ -243,7 +243,7 @@ class DocumentEp:
         )
 
 
-class PageEp:
+class PagePath:
     """
     schema://.../<doc_id>/pages/<page_num>/<step>/page-<xyz>.jpg
     """
@@ -256,11 +256,11 @@ class PageEp:
         step=None
     ):
         if not isinstance(page_num, int):
-            msg_err = f"PageEp.page_num must be an int. Got {page_num}."
+            msg_err = f"PagePath.page_num must be an int. Got {page_num}."
             raise ValueError(msg_err)
 
         self.document_ep = document_ep
-        self.results_document_ep = DocumentEp.copy_from(
+        self.results_document_ep = DocumentPath.copy_from(
             document_ep,
             aux_dir=AUX_DIR_RESULTS
         )
