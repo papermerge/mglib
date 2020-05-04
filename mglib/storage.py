@@ -60,3 +60,7 @@ class Storage:
         return os.path.exists(
             self.path(_path)
         )
+
+
+class FileSystemStorage(Storage):
+    pass

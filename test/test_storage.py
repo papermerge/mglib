@@ -2,7 +2,7 @@ import os
 import unittest
 from mglib.test.utils import TemporaryNode
 from mglib.path import DocumentPath
-from mglib.storage import Storage
+from mglib.storage import FileSystemStorage
 
 
 BASE_DIR = os.path.dirname(
@@ -16,7 +16,7 @@ MEDIA_ROOT = os.path.join(
 class TestStorage(unittest.TestCase):
 
     def test_delete(self):
-        storage = Storage(location=MEDIA_ROOT)
+        storage = FileSystemStorage(location=MEDIA_ROOT)
 
         with TemporaryNode(MEDIA_ROOT) as media_root:
             docs = media_root.add_folder("docs")
