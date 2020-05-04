@@ -204,8 +204,6 @@ class TestPageEp(unittest.TestCase):
 
     def test_versioned_page_ep(self):
         doc_ep = DocumentEp(
-            remote_endpoint=self.remote_ep,
-            local_endpoint=self.local_ep,
             user_id=1,
             document_id=3,
             file_name="x.pdf"
@@ -229,8 +227,6 @@ class TestPageEp(unittest.TestCase):
             page_ep.url() returns page_ep.txt_url()
         """
         doc_ep = DocumentEp(
-            remote_endpoint=self.remote_ep,
-            local_endpoint=self.local_ep,
             user_id=1,
             document_id=3,
             file_name="x.pdf"
@@ -248,8 +244,6 @@ class TestPageEp(unittest.TestCase):
 
     def test_ppmroot(self):
         doc_ep = DocumentEp(
-            remote_endpoint=self.remote_ep,
-            local_endpoint=self.local_ep,
             user_id=1,
             document_id=3,
             file_name="x.pdf"

@@ -6,6 +6,9 @@ from botocore.errorfactory import ClientError
 
 logger = logging.getLogger(__name__)
 
+AUX_DIR_DOCS = "docs"
+AUX_DIR_RESULTS = "results"
+
 
 def get_keyname(s3_url):
     """
@@ -115,8 +118,8 @@ class Endpoint:
 
 class DocumentEp:
     """
-    Document Endpoint:
-    <schema>://<media_root>/<aux_dir>/<user_id>/<doc_id>/<version>/<file_name>
+    Document Endpoint path:
+    /<aux_dir>/<user_id>/<doc_id>/<version>/<file_name>
 
     If version = 0, it is not included in Endpoint.
     Document's version is incremented everytime pdftk operation runs on it
@@ -125,16 +128,12 @@ class DocumentEp:
 
     def __init__(
         self,
-        remote_endpoint,
-        local_endpoint,
         user_id,
         document_id,
         file_name,
-        aux_dir="docs",
+        aux_dir=AUX_DIR_DOCS,
         version=0
     ):
-        self.remote_endpoint = remote_endpoint
-        self.local_endpoint = local_endpoint
         self.user_id = user_id
         self.document_id = document_id
         self.file_name = file_name
@@ -157,11 +156,26 @@ class DocumentEp:
         return full_path
 
     @property
-    def dirname(self):
-        root_dir = f"{self.local_endpoint.dirname}"
+    def dirname_docs(self):
+        _path = (
+            f"{AUX_DIR_DOCS}/user_{self.user_id}/"
+            f"document_{self.document_id}/"
+        )
 
+        return _path
+
+    @property
+    def dirname_results(self):
+        _path = (
+            f"{AUX_DIR_RESULTS}/user_{self.user_id}/"
+            f"document_{self.document_id}/"
+        )
+
+        return _path
+
+    @property
+    def dirname(self):
         full_path = (
-            f"{root_dir}"
             f"{self.aux_dir}/user_{self.user_id}/"
             f"document_{self.document_id}/"
         )
@@ -221,8 +235,6 @@ class DocumentEp:
 
     def copy_from(doc_ep, aux_dir):
         return DocumentEp(
-            remote_endpoint=doc_ep.remote_endpoint,
-            local_endpoint=doc_ep.local_endpoint,
             user_id=doc_ep.user_id,
             document_id=doc_ep.document_id,
             file_name=doc_ep.file_name,
@@ -250,7 +262,7 @@ class PageEp:
         self.document_ep = document_ep
         self.results_document_ep = DocumentEp.copy_from(
             document_ep,
-            aux_dir="results"
+            aux_dir=AUX_DIR_RESULTS
         )
         self.page_count = page_count
         self.page_num = page_num
