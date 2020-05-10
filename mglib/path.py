@@ -102,7 +102,7 @@ class PagePath:
 
     def __init__(
         self,
-        document_ep,
+        document_path,
         page_num,
         page_count,
         step=None
@@ -111,15 +111,15 @@ class PagePath:
             msg_err = f"PagePath.page_num must be an int. Got {page_num}."
             raise ValueError(msg_err)
 
-        self.document_ep = document_ep
+        self.document_path = document_path
         self.results_document_ep = DocumentPath.copy_from(
-            document_ep,
+            document_path,
             aux_dir=AUX_DIR_RESULTS
         )
         self.page_count = page_count
         self.page_num = page_num
         self.step = step
-        self.pages = self.document_ep.pages
+        self.pages = self.document_path.pages
 
     @property
     def ppmroot(self):
@@ -133,7 +133,7 @@ class PagePath:
 
     @property
     def pages_dirname(self):
-        return self.document_ep.pages_dirname
+        return self.document_path.pages_dirname
 
     @property
     def path(self):

@@ -21,10 +21,13 @@ class Storage:
     def location(self):
         return self._location
 
-    def path(self, _path):
+    def abspath(self, _path):
         return os.path.join(
             self.location, _path
         )
+
+    def path(self, _path):
+        return self.abspath(_path)
 
     def delete_document(self, doc_path):
         """
@@ -55,6 +58,29 @@ class Storage:
             shutil.rmtree(abs_dirname_results)
             if os.path.exists(abs_dirname_results):
                 os.rmdir(abs_dirname_results)
+
+    def copy_doc(self, src, dst):
+        """
+        copy given file src file path to destination
+        as absolute doc_path
+        """
+
+        dirname = os.path.dirname(
+            self.abspath(dst)
+        )
+        if not os.path.exists(
+            dirname
+        ):
+            os.makedirs(
+                dirname, exist_ok=True
+            )
+        logger.debug(
+            f"copy_doc: {src} to {dst}"
+        )
+        shutil.copyfile(
+            src,
+            self.abspath(dst)
+        )
 
     def exists(self, _path):
         return os.path.exists(
