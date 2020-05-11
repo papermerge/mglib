@@ -87,6 +87,39 @@ class Storage:
             self.path(_path)
         )
 
+    def delete_pages(self, doc_path, page_numers):
+        """
+        Delets pages in the document pointed by doc_path.
+        doc_path is an instance of mglib.path.DocumentPath
+
+        In case of success returns document's new version.
+        """
+        pass
+
+    def reoder_pages(self, doc_path, new_order):
+        """
+        Reorders pages in the document pointed by doc_path.
+        doc_path is an instance of mglib.path.DocumentPath
+
+        In case of success returns document's new version.
+        """
+        pass
+
+    def paste_pages(
+        self,
+        dest_doc_path,
+        src_doc_path,
+        dest_doc_is_new=False,
+        after_page_number=False,
+        before_page_number=False
+    ):
+        """
+        Pastes pages in the document pointed by dest_doc_path
+        from src_doc_path. Both dest and src are instances of
+        mglib.path.DocumentPath
+        """
+        pass
+
 
 class FileSystemStorage(Storage):
     pass
