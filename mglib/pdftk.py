@@ -297,7 +297,9 @@ def paste_pages(
     return dest_doc_ep.version
 
 
-def reorder_pages(doc_path, new_order):
+def reorder_pages(
+    src, dst, new_order
+):
     """
     new_order is a list of following format:
 
@@ -314,19 +316,16 @@ def reorder_pages(doc_path, new_order):
     So in human language, each hash is read:
         <page_num> now should be <page_order>
     """
-    url = doc_path.url()
-    page_count = get_pagecount(url)
+    page_count = get_pagecount(src)
 
     cat_ranges = cat_ranges_for_reorder(
         page_count=page_count,
         new_order=new_order
     )
 
-    doc_path.inc_version()
-
     cmd = [
         "pdftk",
-        url,
+        src,
         "cat"
     ]
     for page in cat_ranges:
@@ -335,11 +334,8 @@ def reorder_pages(doc_path, new_order):
         )
 
     cmd.append("output")
-    make_sure_path_exists(doc_path.url())
-    cmd.append(doc_path.url())
+    cmd.append(dst)
     run(cmd)
-
-    return doc_path.version
 
 
 def delete_pages(doc_ep, page_numbers):

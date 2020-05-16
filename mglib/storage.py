@@ -22,18 +22,6 @@ class Storage:
         # settings.MEDIA_ROOT
         self._location = location
 
-    def d(self):
-        """
-        doc_path proxy object
-        """
-        pass
-
-    def p(self):
-        """
-        page_path proxy object
-        """
-        pass
-
     @property
     def location(self):
         return self._location
@@ -55,7 +43,7 @@ class Storage:
         doc_path_pointing_to_results = DocumentPath.copy_from(
             doc_path, aux_dir="results"
         )
-        pages_dir = doc_path_pointing_to_results.pages_dirname
+        pages_dir = self.abspath(doc_path_pointing_to_results.pages_dirname)
 
         only_dirs = [
             fi for fi in listdir(pages_dir) if isdir(join(pages_dir, fi))
@@ -63,6 +51,15 @@ class Storage:
         return len(only_dirs)
 
     def abspath(self, _path):
+        if isinstance(_path, DocumentPath):
+            return os.path.join(
+                self.location, _path.url()
+            )
+        elif isinstance(_path, PagePath):
+            return os.path.join(
+                self.location, _path.url()
+            )
+
         return os.path.join(
             self.location, _path
         )
@@ -145,48 +142,48 @@ class Storage:
                 raise ValueError(err_msg)
 
         # copy .txt file
-        if src_page_path.txt_exists():
+        if self.exists(src_page_path.txt_url()):
 
             self.make_sure_path_exists(
-                dst_page_path.txt_url()
+                self.abspath(dst_page_path.txt_url())
             )
 
-            src_txt = src_page_path.txt_url()
-            dst_txt = dst_page_path.txt_url()
+            src_txt = self.abspath(src_page_path.txt_url())
+            dst_txt = self.abspath(dst_page_path.txt_url())
             logger.debug(f"copy src_txt={src_txt} dst_txt={dst_txt}")
             shutil.copy(src_txt, dst_txt)
         else:
             logger.debug(
-                f"txt does not exits {src_page_path.txt_exists()}"
+                f"txt does not exits {src_page_path.txt_url()}"
             )
 
         # hocr
-        if src_page_path.hocr_exists():
+        if self.exists(src_page_path.hocr_url()):
             self.make_sure_path_exists(
-                dst_page_path.hocr_url()
+                self.abspath(dst_page_path.hocr_url())
             )
 
-            src_hocr = src_page_path.hocr_url()
-            dst_hocr = dst_page_path.hocr_url()
+            src_hocr = self.abspath(src_page_path.hocr_url())
+            dst_hocr = self.abspath(dst_page_path.hocr_url())
             logger.debug(f"copy src_hocr={src_hocr} dst_hocr={dst_hocr}")
             shutil.copy(src_hocr, dst_hocr)
         else:
             logger.debug(
-                f"hocr does not exits {src_page_path.hocr_exists()}"
+                f"hocr does not exits {src_page_path.hocr_url()}"
             )
 
-        if src_page_path.img_exists():
+        if src_page_path.img_url():
             self.make_sure_path_exists(
-                dst_page_path.img_url()
+                self.abspath(dst_page_path.img_url())
             )
 
-            src_img = src_page_path.img_url()
-            dst_img = dst_page_path.img_url()
+            src_img = self.abspath(src_page_path.img_url())
+            dst_img = self.abspath(dst_page_path.img_url())
             logger.debug(f"copy src_img={src_img} dst_img={dst_img}")
             shutil.copy(src_img, dst_img)
         else:
             logger.debug(
-                f"img does not exits {src_page_path.img_exists()}"
+                f"img does not exits {src_page_path.img_url()}"
             )
 
     def reorder_pages(self, doc_path, new_order):
@@ -211,14 +208,22 @@ class Storage:
         So in human language, each hash is read:
             <page_num> now should be <page_order>
         """
-        new_version = pdftk.reorder_pages(doc_path, new_order)
-
-        page_count = self.get_pagecount(doc_path)
         src_doc_path = doc_path
         dst_doc_path = DocumentPath.copy_from(
             src_doc_path,
-            version=new_version
+            version=doc_path.version + 1
         )
+        self.make_sure_path_exists(
+            self.abspath(dst_doc_path)
+        )
+
+        pdftk.reorder_pages(
+            src=self.abspath(src_doc_path),
+            dst=self.abspath(dst_doc_path),
+            new_order=new_order
+        )
+
+        page_count = self.get_pagecount(doc_path)
 
         if len(new_order) > page_count:
             logger.error(
@@ -235,7 +240,7 @@ class Storage:
                     page_count=len(new_order)
                 )
                 dst_page_path = PagePath(
-                    document_ep=dst_doc_path,
+                    document_path=dst_doc_path,
                     page_num=int(item['page_order']),
                     step=step,
                     page_count=len(new_order)
@@ -245,7 +250,7 @@ class Storage:
                     dst_page_path=dst_page_path
                 )
 
-            return new_version
+            return doc_path.version + 1
 
     def paste_pages(
         self,
