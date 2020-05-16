@@ -250,7 +250,7 @@ class Storage:
                     dst_page_path=dst_page_path
                 )
 
-            return doc_path.version + 1
+        return doc_path.version + 1
 
     def paste_pages(
         self,
