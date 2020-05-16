@@ -1,7 +1,12 @@
 import os
+from os import listdir
+from os.path import isdir, join
 import logging
 import shutil
+from mglib.step import Steps
 from mglib.utils import safe_to_delete
+from mglib import pdftk
+from mglib.path import PagePath, DocumentPath
 
 logger = logging.getLogger(__name__)
 
@@ -17,9 +22,45 @@ class Storage:
         # settings.MEDIA_ROOT
         self._location = location
 
+    def d(self):
+        """
+        doc_path proxy object
+        """
+        pass
+
+    def p(self):
+        """
+        page_path proxy object
+        """
+        pass
+
     @property
     def location(self):
         return self._location
+
+    def make_sure_path_exists(self, filepath):
+        logger.debug(f"make_sure_path_exists {filepath}")
+        dirname = os.path.dirname(filepath)
+        os.makedirs(
+            dirname,
+            exist_ok=True
+        )
+
+    def get_pagecount(self, doc_path):
+        """
+        Returns total number of pages for this doc_path.
+        Total number of pages = number of page_xy.txt files
+        in pages_dirname folder.
+        """
+        doc_path_pointing_to_results = DocumentPath.copy_from(
+            doc_path, aux_dir="results"
+        )
+        pages_dir = doc_path_pointing_to_results.pages_dirname
+
+        only_dirs = [
+            fi for fi in listdir(pages_dir) if isdir(join(pages_dir, fi))
+        ]
+        return len(only_dirs)
 
     def abspath(self, _path):
         return os.path.join(
@@ -29,7 +70,7 @@ class Storage:
     def path(self, _path):
         return self.abspath(_path)
 
-    def delete_document(self, doc_path):
+    def delete_doc(self, doc_path):
         """
         Receives a mglib.path.DocumentPath instance
         """
@@ -96,14 +137,115 @@ class Storage:
         """
         pass
 
-    def reoder_pages(self, doc_path, new_order):
+    def copy_page(self, src_page_path, dst_page_path):
+        err_msg = "copy_page accepts only PageEp instances"
+
+        for inst in [src_page_path, dst_page_path]:
+            if not isinstance(inst, PagePath):
+                raise ValueError(err_msg)
+
+        # copy .txt file
+        if src_page_path.txt_exists():
+
+            self.make_sure_path_exists(
+                dst_page_path.txt_url()
+            )
+
+            src_txt = src_page_path.txt_url()
+            dst_txt = dst_page_path.txt_url()
+            logger.debug(f"copy src_txt={src_txt} dst_txt={dst_txt}")
+            shutil.copy(src_txt, dst_txt)
+        else:
+            logger.debug(
+                f"txt does not exits {src_page_path.txt_exists()}"
+            )
+
+        # hocr
+        if src_page_path.hocr_exists():
+            self.make_sure_path_exists(
+                dst_page_path.hocr_url()
+            )
+
+            src_hocr = src_page_path.hocr_url()
+            dst_hocr = dst_page_path.hocr_url()
+            logger.debug(f"copy src_hocr={src_hocr} dst_hocr={dst_hocr}")
+            shutil.copy(src_hocr, dst_hocr)
+        else:
+            logger.debug(
+                f"hocr does not exits {src_page_path.hocr_exists()}"
+            )
+
+        if src_page_path.img_exists():
+            self.make_sure_path_exists(
+                dst_page_path.img_url()
+            )
+
+            src_img = src_page_path.img_url()
+            dst_img = dst_page_path.img_url()
+            logger.debug(f"copy src_img={src_img} dst_img={dst_img}")
+            shutil.copy(src_img, dst_img)
+        else:
+            logger.debug(
+                f"img does not exits {src_page_path.img_exists()}"
+            )
+
+    def reorder_pages(self, doc_path, new_order):
         """
         Reorders pages in the document pointed by doc_path.
         doc_path is an instance of mglib.path.DocumentPath
 
         In case of success returns document's new version.
+
+        new_order is a list of following format:
+
+            [
+                {'page_num': 2, page_order: 1},
+                {'page_num': 1, page_order: 2},
+                {'page_num': 3, page_order: 3},
+                {'page_num': 4, page_order: 4},
+            ]
+        Example above means that in current document of 4 pages,
+        first page was swapped with second one.
+        page_num    = older page order
+        page_order  = current page order
+        So in human language, each hash is read:
+            <page_num> now should be <page_order>
         """
-        pass
+        new_version = pdftk.reorder_pages(doc_path, new_order)
+
+        page_count = self.get_pagecount(doc_path)
+        src_doc_path = doc_path
+        dst_doc_path = DocumentPath.copy_from(
+            src_doc_path,
+            version=new_version
+        )
+
+        if len(new_order) > page_count:
+            logger.error(
+                f"deleted_pages({new_order}) > page_count({page_count})"
+            )
+            return
+
+        for item in new_order:
+            for step in Steps():
+                src_page_path = PagePath(
+                    document_path=src_doc_path,
+                    page_num=int(item['page_num']),
+                    step=step,
+                    page_count=len(new_order)
+                )
+                dst_page_path = PagePath(
+                    document_ep=dst_doc_path,
+                    page_num=int(item['page_order']),
+                    step=step,
+                    page_count=len(new_order)
+                )
+                self.copy_page(
+                    src_page_path=src_page_path,
+                    dst_page_path=dst_page_path
+                )
+
+            return new_version
 
     def paste_pages(
         self,

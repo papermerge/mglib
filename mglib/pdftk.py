@@ -1,4 +1,3 @@
-import os
 import logging
 
 from mglib.runcmd import run
@@ -90,15 +89,6 @@ def cat_ranges_for_delete(page_count, page_numbers):
             results.append(number)
 
     return results
-
-
-def make_sure_path_exists(filepath):
-    logger.debug(f"make_sure_path_exists {filepath}")
-    dirname = os.path.dirname(filepath)
-    os.makedirs(
-        dirname,
-        exist_ok=True
-    )
 
 
 def split_ranges(total, after=False, before=False):
@@ -307,7 +297,7 @@ def paste_pages(
     return dest_doc_ep.version
 
 
-def reorder_pages(doc_ep, new_order):
+def reorder_pages(doc_path, new_order):
     """
     new_order is a list of following format:
 
@@ -324,19 +314,19 @@ def reorder_pages(doc_ep, new_order):
     So in human language, each hash is read:
         <page_num> now should be <page_order>
     """
-    ep_url = doc_ep.url()
-    page_count = get_pagecount(ep_url)
+    url = doc_path.url()
+    page_count = get_pagecount(url)
 
     cat_ranges = cat_ranges_for_reorder(
         page_count=page_count,
         new_order=new_order
     )
 
-    doc_ep.inc_version()
+    doc_path.inc_version()
 
     cmd = [
         "pdftk",
-        ep_url,
+        url,
         "cat"
     ]
     for page in cat_ranges:
@@ -345,11 +335,11 @@ def reorder_pages(doc_ep, new_order):
         )
 
     cmd.append("output")
-    make_sure_path_exists(doc_ep.url())
-    cmd.append(doc_ep.url())
+    make_sure_path_exists(doc_path.url())
+    cmd.append(doc_path.url())
     run(cmd)
 
-    return doc_ep.version
+    return doc_path.version
 
 
 def delete_pages(doc_ep, page_numbers):

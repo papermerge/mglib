@@ -19,20 +19,6 @@ OcrMigrate class takes care of this sort of txt/hocr files moves.
 logger = logging.getLogger(__name__)
 
 
-def get_pagecount(doc_ep):
-    """
-    Returns total number of pages for this endpoint.
-    Total number of pages = number of page_xy.txt files
-    in pages_dirname folder.
-    """
-    doc_ep_pointing_to_results = DocumentPath.copy_from(
-        doc_ep, aux_dir="results"
-    )
-    pages_dir = doc_ep_pointing_to_results.pages_dirname
-    only_dirs = [
-        fi for fi in listdir(pages_dir) if isdir(join(pages_dir, fi))
-    ]
-    return len(only_dirs)
 
 
 def get_assigns_after_delete(total_pages, deleted_pages):
@@ -83,50 +69,6 @@ def get_assigns_after_delete(total_pages, deleted_pages):
     return list(zip(page_numbers, pages))
 
 
-def copy_page(src_page_ep, dst_page_ep):
-    err_msg = "copy_page accepts only PageEp instances"
-
-    for inst in [src_page_ep, dst_page_ep]:
-        if not isinstance(inst, PagePath):
-            raise ValueError(err_msg)
-
-    # copy .txt file
-    if src_page_ep.txt_exists():
-        make_sure_path_exists(dst_page_ep.txt_url())
-
-        src_txt = src_page_ep.txt_url()
-        dst_txt = dst_page_ep.txt_url()
-        logger.debug(f"copy src_txt={src_txt} dst_txt={dst_txt}")
-        shutil.copy(src_txt, dst_txt)
-    else:
-        logger.debug(
-            f"txt does not exits {src_page_ep.txt_exists()}"
-        )
-
-    # hocr
-    if src_page_ep.hocr_exists():
-        make_sure_path_exists(dst_page_ep.hocr_url())
-
-        src_hocr = src_page_ep.hocr_url()
-        dst_hocr = dst_page_ep.hocr_url()
-        logger.debug(f"copy src_hocr={src_hocr} dst_hocr={dst_hocr}")
-        shutil.copy(src_hocr, dst_hocr)
-    else:
-        logger.debug(
-            f"hocr does not exits {src_page_ep.hocr_exists()}"
-        )
-
-    if src_page_ep.img_exists():
-        make_sure_path_exists(dst_page_ep.img_url())
-
-        src_img = src_page_ep.img_url()
-        dst_img = dst_page_ep.img_url()
-        logger.debug(f"copy src_img={src_img} dst_img={dst_img}")
-        shutil.copy(src_img, dst_img)
-    else:
-        logger.debug(
-            f"img does not exits {src_page_ep.img_exists()}"
-        )
 
 
 def migrate_cutted_pages(dest_ep, src_doc_ep_list):
@@ -240,29 +182,3 @@ class OcrMigrate:
         """
         Similar to migrate_delete, with minor tweaks.
         """
-        page_count = get_pagecount(self.src_ep)
-
-        if len(new_order) > page_count:
-            logger.error(
-                f"deleted_pages({new_order}) > page_count({page_count})"
-            )
-            return
-
-        for item in new_order:
-            for step in Steps():
-                src_page_ep = PageEp(
-                    document_ep=self.src_ep,
-                    page_num=int(item['page_num']),
-                    step=step,
-                    page_count=len(new_order)
-                )
-                dst_page_ep = PageEp(
-                    document_ep=self.dst_ep,
-                    page_num=int(item['page_order']),
-                    step=step,
-                    page_count=len(new_order)
-                )
-                copy_page(
-                    src_page_ep=src_page_ep,
-                    dst_page_ep=dst_page_ep
-                )

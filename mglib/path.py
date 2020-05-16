@@ -85,13 +85,33 @@ class DocumentPath:
     def inc_version(self):
         self.version = self.version + 1
 
-    def copy_from(doc_ep, aux_dir):
+    def copy_from(doc_path, **kw):
+        """
+        Will create a copy of provided
+        DocumentPath (first parameter = doc_path) and replace
+        existing parameter of new copy with the one from kw.
+
+        kw => key/value parameters.
+        Keys can be one of doc_path attributes: user_id, document_id,
+        file_name, aux_dir, version
+        """
+        copy_values = {
+            'user_id': doc_path.user_id,
+            'document_id': doc_path.document_id,
+            'file_name': doc_path.file_name,
+            'version': doc_path.version,
+            'aux_dir': doc_path.aux_dir
+
+        }
+        for key, value in kw.items():
+            copy_values[key] = kw[key]
+
         return DocumentPath(
-            user_id=doc_ep.user_id,
-            document_id=doc_ep.document_id,
-            file_name=doc_ep.file_name,
-            version=doc_ep.version,
-            aux_dir=aux_dir
+            user_id=copy_values['user_id'],
+            document_id=copy_values['document_id'],
+            file_name=copy_values['file_name'],
+            version=copy_values['version'],
+            aux_dir=copy_values['aux_dir']
         )
 
 
