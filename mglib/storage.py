@@ -326,6 +326,7 @@ class Storage:
         )
 
         pdftk.paste_pages(
+            src=self.abspath(dest_doc_path),
             dst=self.abspath(next_ver_dp),
             data_list=data_list,
             dst_doc_is_new=dest_doc_is_new,

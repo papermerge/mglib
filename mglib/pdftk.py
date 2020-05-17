@@ -134,12 +134,13 @@ def split_ranges(total, after=False, before=False):
 
 
 def paste_pages_into_existing_doc(
+    src,
     dst,
     data_list,
     after_page_number=False,
     before_page_number=False
 ):
-    page_count = get_pagecount(dst)
+    page_count = get_pagecount(src)
     list1, list2 = split_ranges(
         total=page_count,
         after=after_page_number,
@@ -155,7 +156,7 @@ def paste_pages_into_existing_doc(
     letters_pages_after = []
 
     letters_2_doc_map.append(
-        f"A={dst.url()}"
+        f"A={src}"
     )
 
     for idx in range(0, len(data_list)):
@@ -204,6 +205,7 @@ def paste_pages_into_existing_doc(
 
 
 def paste_pages(
+    src,
     dst,
     data_list,
     dst_doc_is_new=True,
@@ -246,6 +248,7 @@ def paste_pages(
     """
     if not dst_doc_is_new:
         return paste_pages_into_existing_doc(
+            src=src,
             dst=dst,
             data_list=data_list,
             after_page_number=after_page_number,
