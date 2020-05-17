@@ -334,6 +334,19 @@ class Storage:
             before_page_number=before_page_number
         )
 
+        if not dest_doc_is_new:
+            # migrate document's own pages from previous
+            # version (this differs from pasting into newly
+            # created docs)
+            pcount = self.get_pagecount(dest_doc_path)
+            data_list.insert(
+                0,
+                {
+                    'doc_path': dest_doc_path,
+                    'page_nums': list(range(1, pcount + 1))
+                }
+            )
+
         dest_page_num = 1
         dest_page_count = sum([
             len(item['page_nums']) for item in data_list
