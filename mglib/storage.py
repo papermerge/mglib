@@ -4,7 +4,10 @@ from os.path import isdir, join
 import logging
 import shutil
 from mglib.step import Steps
-from mglib.utils import safe_to_delete
+from mglib.utils import (
+    safe_to_delete,
+    get_assigns_after_delete
+)
 from mglib import pdftk
 from mglib.path import PagePath, DocumentPath
 
@@ -125,15 +128,6 @@ class Storage:
             self.path(_path)
         )
 
-    def delete_pages(self, doc_path, page_numers):
-        """
-        Delets pages in the document pointed by doc_path.
-        doc_path is an instance of mglib.path.DocumentPath
-
-        In case of success returns document's new version.
-        """
-        pass
-
     def copy_page(self, src_page_path, dst_page_path):
         err_msg = "copy_page accepts only PageEp instances"
 
@@ -244,6 +238,64 @@ class Storage:
                     page_num=int(item['page_order']),
                     step=step,
                     page_count=len(new_order)
+                )
+                self.copy_page(
+                    src_page_path=src_page_path,
+                    dst_page_path=dst_page_path
+                )
+
+        return doc_path.version + 1
+
+    def delete_pages(self, doc_path, page_numbers):
+        """
+        Delets pages in the document pointed by doc_path.
+        doc_path is an instance of mglib.path.DocumentPath
+
+        In case of success returns document's new version.
+        """
+
+        if not isinstance(page_numbers, list):
+            logger.error("Expecting list argument")
+            return False
+
+        src_doc_path = doc_path
+        dst_doc_path = DocumentPath.copy_from(
+            src_doc_path,
+            version=doc_path.version + 1
+        )
+        self.make_sure_path_exists(
+            self.abspath(dst_doc_path)
+        )
+        pdftk.delete_pages(
+            self.abspath(src_doc_path),
+            self.abspath(dst_doc_path),
+            page_numbers
+        )
+
+        page_count = self.get_pagecount(doc_path)
+        if len(page_numbers) > page_count:
+            logger.error(
+                f"deleted_pages({page_numbers}) > page_count({page_count})"
+            )
+            return
+
+        assigns = get_assigns_after_delete(
+            total_pages=page_count,
+            deleted_pages=page_numbers
+        )
+        for a in assigns:
+            for step in Steps():
+                src_page_path = PagePath(
+                    document_path=src_doc_path,
+                    page_num=a[1],
+                    step=step,
+                    page_count=page_count
+                )
+                dst_page_path = PagePath(
+                    document_path=dst_doc_path,
+                    page_num=a[0],
+                    step=step,
+                    page_count=page_count - len(page_numbers)
                 )
                 self.copy_page(
                     src_page_path=src_page_path,

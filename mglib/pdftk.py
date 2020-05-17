@@ -338,20 +338,17 @@ def reorder_pages(
     run(cmd)
 
 
-def delete_pages(doc_ep, page_numbers):
-    ep_url = doc_ep.url()
-    page_count = get_pagecount(ep_url)
+def delete_pages(src, dst, page_numbers):
+    page_count = get_pagecount(src)
 
     cat_ranges = cat_ranges_for_delete(
         page_count,
         page_numbers
     )
 
-    doc_ep.inc_version()
-
     cmd = [
         "pdftk",
-        ep_url,
+        src,
         "cat"
     ]
     for page in cat_ranges:
@@ -360,9 +357,6 @@ def delete_pages(doc_ep, page_numbers):
         )
 
     cmd.append("output")
-    make_sure_path_exists(doc_ep.url())
-    cmd.append(doc_ep.url())
+    cmd.append(dst)
 
     run(cmd)
-
-    return doc_ep.version
