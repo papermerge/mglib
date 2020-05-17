@@ -134,12 +134,12 @@ def split_ranges(total, after=False, before=False):
 
 
 def paste_pages_into_existing_doc(
-    dest_doc_ep,
-    src_doc_ep_list,
+    dst,
+    data_list,
     after_page_number=False,
     before_page_number=False
 ):
-    page_count = get_pagecount(dest_doc_ep.url())
+    page_count = get_pagecount(dst)
     list1, list2 = split_ranges(
         total=page_count,
         after=after_page_number,
@@ -155,23 +155,21 @@ def paste_pages_into_existing_doc(
     letters_pages_after = []
 
     letters_2_doc_map.append(
-        f"A={dest_doc_ep.url()}"
+        f"A={dst.url()}"
     )
 
-    for idx in range(0, len(src_doc_ep_list)):
+    for idx in range(0, len(data_list)):
         letter = letters[idx]
-        doc_ep = src_doc_ep_list[idx]['doc_ep']
-        pages = src_doc_ep_list[idx]['page_nums']
+        src = data_list[idx]['src']
+        pages = data_list[idx]['page_nums']
 
         letters_2_doc_map.append(
-            f"{letter}={doc_ep.url()}"
+            f"{letter}={src}"
         )
         for p in pages:
             letters_pages.append(
                 f"{letter}{p}"
             )
-
-    dest_doc_ep.inc_version()
 
     for p in list1:
         letters_pages_before.append(
@@ -200,19 +198,15 @@ def paste_pages_into_existing_doc(
 
     cmd.append("output")
 
-    make_sure_path_exists(dest_doc_ep.url())
-
-    cmd.append(dest_doc_ep.url())
+    cmd.append(dst)
 
     run(cmd)
 
-    return dest_doc_ep.version
-
 
 def paste_pages(
-    dest_doc_ep,
-    src_doc_ep_list,
-    dest_doc_is_new=True,
+    dst,
+    data_list,
+    dst_doc_is_new=True,
     after_page_number=False,
     before_page_number=False
 ):
@@ -234,12 +228,12 @@ def paste_pages(
     src_doc_ep_list is a list of documents where pages
     (with numbers page_num_1...) will be paste from.
 
-    dest_doc_is_new = True well.. destination document was just created,
+    dst_doc_is_new = True well.. destination document was just created,
     we are pasting here cutted pages into some folder as new document.
 
     In this case 'after' and 'before' arguments are ignored
 
-    dest_doc_is_new = False, pasting pages into exiting document.
+    dst_doc_is_new = False, pasting pages into exiting document.
     If before_page_number > 0 - paste pages before page number
         'before_page_number'
     If after_page_number > 0 - paste pages after page number
@@ -250,10 +244,10 @@ def paste_pages(
     If both before_page_number and after_page_number are < 0 - just paste
     pages at the end of the document.
     """
-    if not dest_doc_is_new:
+    if not dst_doc_is_new:
         return paste_pages_into_existing_doc(
-            dest_doc_ep=dest_doc_ep,
-            src_doc_ep_list=src_doc_ep_list,
+            dst=dst,
+            data_list=data_list,
             after_page_number=after_page_number,
             before_page_number=before_page_number
         )
@@ -261,20 +255,18 @@ def paste_pages(
     letters_2_doc_map = []
     letters_pages = []
 
-    for idx in range(0, len(src_doc_ep_list)):
+    for idx in range(0, len(data_list)):
         letter = letters[idx]
-        doc_ep = src_doc_ep_list[idx]['doc_ep']
-        pages = src_doc_ep_list[idx]['page_nums']
+        src = data_list[idx]['src']
+        pages = data_list[idx]['page_nums']
 
         letters_2_doc_map.append(
-            f"{letter}={doc_ep.url()}"
+            f"{letter}={src}"
         )
         for p in pages:
             letters_pages.append(
                 f"{letter}{p}"
             )
-
-    dest_doc_ep.inc_version()
 
     cmd = [
         "pdftk",
@@ -288,13 +280,9 @@ def paste_pages(
 
     cmd.append("output")
 
-    make_sure_path_exists(dest_doc_ep.url())
-
-    cmd.append(dest_doc_ep.url())
+    cmd.append(dst)
 
     run(cmd)
-
-    return dest_doc_ep.version
 
 
 def reorder_pages(

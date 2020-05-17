@@ -307,7 +307,7 @@ class Storage:
     def paste_pages(
         self,
         dest_doc_path,
-        src_doc_path,
+        data_list,
         dest_doc_is_new=False,
         after_page_number=False,
         before_page_number=False
@@ -317,7 +317,48 @@ class Storage:
         from src_doc_path. Both dest and src are instances of
         mglib.path.DocumentPath
         """
-        pass
+        next_ver_dp = DocumentPath.copy_from(
+            dest_doc_path,
+            version=dest_doc_path.version + 1
+        )
+        self.make_sure_path_exists(
+            self.abspath(next_ver_dp)
+        )
+
+        pdftk.paste_pages(
+            dst=self.abspath(next_ver_dp),
+            data_list=data_list,
+            dst_doc_is_new=dest_doc_is_new,
+            after_page_number=after_page_number,
+            before_page_number=before_page_number
+        )
+
+        dest_page_num = 1
+        dest_page_count = sum([
+            len(item['page_nums']) for item in data_list
+        ])
+        for item in data_list:
+            src_path = item['doc_path']
+            for page_num in item['page_nums']:
+                for step in Steps():
+                    src_page_path = PagePath(
+                        document_path=src_path,
+                        page_num=int(page_num),
+                        step=step,
+                        page_count=self.get_pagecount(src_path)
+                    )
+                    dst_page_path = PagePath(
+                        document_path=next_ver_dp,
+                        page_num=dest_page_num,
+                        step=step,
+                        page_count=dest_page_count
+                    )
+                    logger.debug(f"src={src_page_path}  dst={dst_page_path}")
+                    self.copy_page(
+                        src_page_path=src_page_path,
+                        dst_page_path=dst_page_path
+                    )
+                dest_page_num += 1
 
 
 class FileSystemStorage(Storage):
