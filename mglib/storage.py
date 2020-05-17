@@ -360,6 +360,8 @@ class Storage:
                     )
                 dest_page_num += 1
 
+        return dest_doc_path.version + 1
+
 
 class FileSystemStorage(Storage):
     pass
