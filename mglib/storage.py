@@ -1,15 +1,13 @@
+import logging
 import os
+import shutil
 from os import listdir
 from os.path import isdir, join
-import logging
-import shutil
-from mglib.step import Steps
-from mglib.utils import (
-    safe_to_delete,
-    get_assigns_after_delete
-)
+
 from mglib import pdftk
-from mglib.path import PagePath, DocumentPath
+from mglib.path import DocumentPath, PagePath
+from mglib.step import Steps
+from mglib.utils import get_assigns_after_delete, safe_to_delete
 
 logger = logging.getLogger(__name__)
 
@@ -246,7 +244,7 @@ class Storage:
 
         return doc_path.version + 1
 
-    def delete_pages(self, doc_path, page_numbers):
+    def delete_pages(self, doc_path, page_numbers, total_page_count=None):
         """
         Delets pages in the document pointed by doc_path.
         doc_path is an instance of mglib.path.DocumentPath
@@ -272,7 +270,10 @@ class Storage:
             page_numbers
         )
 
-        page_count = self.get_pagecount(doc_path)
+        if total_page_count:
+            page_count = total_page_count
+        else:
+            page_count = self.get_pagecount(doc_path)
         if len(page_numbers) > page_count:
             logger.error(
                 f"deleted_pages({page_numbers}) > page_count({page_count})"

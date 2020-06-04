@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="mglib",
-    version="1.0.1",
+    version="1.0.3",
     author="Eugen Ciur",
     author_email="eugen@papermerge.com",
     url="https://github.com/papermerge/mglib",
