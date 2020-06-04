@@ -244,7 +244,12 @@ class Storage:
 
         return doc_path.version + 1
 
-    def delete_pages(self, doc_path, page_numbers, total_page_count=None):
+    def delete_pages(
+        self,
+        doc_path,
+        page_numbers,
+        skip_migration=False
+    ):
         """
         Delets pages in the document pointed by doc_path.
         doc_path is an instance of mglib.path.DocumentPath
@@ -270,10 +275,11 @@ class Storage:
             page_numbers
         )
 
-        if total_page_count:
-            page_count = total_page_count
-        else:
-            page_count = self.get_pagecount(doc_path)
+        if skip_migration:
+            return doc_path.version + 1
+
+        page_count = self.get_pagecount(doc_path)
+
         if len(page_numbers) > page_count:
             logger.error(
                 f"deleted_pages({page_numbers}) > page_count({page_count})"
