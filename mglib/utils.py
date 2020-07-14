@@ -6,7 +6,14 @@ import importlib.util
 
 logger = logging.getLogger(__name__)
 
-SAFE_EXTENSIONS = ['.txt', '.jpg', '.hocr', '.pdf']
+SAFE_EXTENSIONS = [
+    '.txt',
+    '.jpg',
+    '.jpeg',
+    '.png',
+    '.hocr',
+    '.pdf',
+]
 
 
 def get_bool(key, default="NO"):
