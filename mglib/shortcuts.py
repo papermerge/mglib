@@ -6,6 +6,39 @@ from mglib.runcmd import run
 logger = logging.getLogger(__name__)
 
 
+def resize_img(page_path, media_root):
+
+    local_abspath = os.path.join(
+        media_root,
+        page_path.document_path.url()
+    )
+    logger.debug(f"Resizing image {page_path.img_url()}")
+
+    ppmroot = os.path.join(media_root, page_path.ppmroot)
+    ppmroot_dirname = os.path.dirname(ppmroot)
+
+    width = page_path.step.width
+
+    if not os.path.exists(ppmroot_dirname):
+        logger.debug(f"PPMROOT {ppmroot_dirname} does not exists. Creating.")
+        os.makedirs(
+            ppmroot_dirname, exist_ok=True
+        )
+    else:
+        logger.debug(f"PPMROOT {ppmroot_dirname} already exists.")
+
+    cmd = (
+        "convert",
+        "-resize",
+        f"{width}x",
+        local_abspath,
+        # output directory path, similar to ppmroot
+        f"{ppmroot}-1.jpg"
+    )
+
+    run(cmd)
+
+
 def extract_img(page_path, media_root):
 
     local_abspath = os.path.join(
