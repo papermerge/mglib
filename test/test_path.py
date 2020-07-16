@@ -76,16 +76,16 @@ class TestDocumentPath(unittest.TestCase):
 class TestPagePath(unittest.TestCase):
 
     def test_versioned_page_ep(self):
-        doc_ep = DocumentPath(
+        doc_path = DocumentPath(
             user_id=1,
             document_id=3,
             file_name="x.pdf"
         )
         # document's version incremented
-        doc_ep.inc_version()
+        doc_path.inc_version()
 
         page_ep = PagePath(
-            document_ep=doc_ep,
+            document_path=doc_path,
             page_num=1,
             page_count=3
         )
@@ -105,7 +105,7 @@ class TestPagePath(unittest.TestCase):
             file_name="x.pdf"
         )
         page_ep = PagePath(
-            document_ep=doc_ep,
+            document_path=doc_ep,
             page_num=1,
             step=Step(1),
             page_count=3
@@ -122,7 +122,7 @@ class TestPagePath(unittest.TestCase):
             file_name="x.pdf"
         )
         page_url = PagePath(
-            document_ep=doc_ep,
+            document_path=doc_ep,
             page_num=1,
             step=Step(1),
             page_count=3

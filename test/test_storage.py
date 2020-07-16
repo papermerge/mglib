@@ -35,7 +35,7 @@ class TestStorage(unittest.TestCase):
                 f1.exists()
             )
 
-            storage.delete_document(doc_path)
+            storage.delete_doc(doc_path)
 
             self.assertFalse(
                 f1.exists()

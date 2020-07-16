@@ -31,10 +31,15 @@ class Mime(wrapper.Wrapper):
             * image/png
             * image/jpg
         """
-        return self.guess() in ('image/png', 'image/jpg')
+        return self.guess() in ('image/png', 'image/jpg', 'image/jpeg')
 
     def guess(self):
         cmd = self.get_cmd()
         complete = self.run(cmd)
 
         return complete.stdout.strip()
+
+    def __str__(self):
+
+        mime_type = self.guess()
+        return f"Mime({self.filepath}, {mime_type})"

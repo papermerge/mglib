@@ -13,6 +13,7 @@ SAFE_EXTENSIONS = [
     '.png',
     '.hocr',
     '.pdf',
+    '.tiff'
 ]
 
 
