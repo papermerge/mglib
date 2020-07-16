@@ -11,6 +11,43 @@ small operations (e.g. get pdf page count).
 logger = logging.getLogger(__name__)
 
 
+def get_tiff_pagecount(filepath):
+    cmd = [
+        "/usr/bin/identify",
+        "-format",
+        "%n\n",
+        filepath
+    ]
+    compl = subprocess.run(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+
+    if compl.returncode:
+
+        logger.error(
+            "get_tiff_pagecount: cmd=%s args=%s stdout=%s stderr=%s code=%s",
+            cmd,
+            compl.args,
+            compl.stdout,
+            compl.stderr,
+            compl.returncode,
+            stack_info=True
+        )
+
+        raise Exception("Error occured while getting document page count.")
+
+    lines = compl.stdout.decode('utf-8').split('\n')
+    # look up for the line containing "Pages: 11"
+    for line in lines:
+        x = re.match(r"(\d+)", line.strip())
+        if x:
+            return int(x.group(1))
+
+    return 0
+
+
 def get_pagecount(filepath):
     """
     Returns the number of pages in a PDF document as integer.
@@ -31,9 +68,12 @@ def get_pagecount(filepath):
         # considered by default one page document.
         return 1
 
-    if ext and ext.lower() not in ('.pdf',):
+    if ext and ext.lower() in ('.tiff', ):
+        return get_tiff_pagecount(filepath)
+
+    if ext and ext.lower() not in ('.pdf', '.tiff'):
         raise ValueError(
-            "Only jpeg, png and pdf are handlerd by this"
+            "Only jpeg, png, pdf and tiff are handlerd by this"
             " method"
         )
 

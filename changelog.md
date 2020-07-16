@@ -1,11 +1,12 @@
 # Changelog
 
-## [1.2.0] - 16 July 2020
+## [1.2.1] - 16 July 2020
 
 ### Added
  
-  - shortcuts.extract_img - resizes/converts images jpg, png documents
-
+  - shortcuts.resize_img - resizes/converts images jpg, png documents
+  - change get_pagecount to work with tiff files as well
+  - bring in last modules from pmworker (mime and wrapper)
 
 ## [1.1.0] - 25 June 2020
 
