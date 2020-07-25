@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.2.2] - 25 July 2020
+## [1.2.3] - 25 July 2020
 
 ### Changed
 
