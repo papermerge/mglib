@@ -38,7 +38,7 @@ def get_tiff_pagecount(filepath):
 
         raise Exception("Error occured while getting document page count.")
 
-    lines = compl.stdout.decode('utf-8').split('\n')
+    lines = _split(stdout=compl.stdout)
     # look up for the line containing "Pages: 11"
     for line in lines:
         x = re.match(r"(\d+)", line.strip())
@@ -100,11 +100,27 @@ def get_pagecount(filepath):
 
         raise Exception("Error occured while getting document page count.")
 
-    lines = compl.stdout.decode('utf-8').split('\n')
+    lines = _split(stdout=compl.stdout)
     # look up for the line containing "Pages: 11"
     for line in lines:
-        x = re.match("Pages:\W+(\d+)$", line.strip())
+        x = re.match(r"Pages:\W+(\d+)$", line.strip())
         if x:
             return int(x.group(1))
 
     return 0
+
+
+def _split(stdout):
+    """
+    stdout is result.stdout where result
+    is whatever is returned by subprocess.run
+    """
+    decoded_text = stdout.decode(
+        'utf-8',
+        # in case there are decoding issues, just replace
+        # problematic characters. We don't need text verbatim.
+        'replace'
+    )
+    lines = decoded_text.split('\n')
+
+    return lines

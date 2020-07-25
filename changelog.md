@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.2.2] - 25 July 2020
+
+### Changed
+
+  - bugfix - get_pagecount handles non utf-8 encoded documents
+
+### Added
+
+- unit tests for get_pagecount
+
 ## [1.2.1] - 16 July 2020
 
 ### Added
