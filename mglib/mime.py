@@ -1,5 +1,5 @@
 import logging
-from pmworker import wrapper
+from . import wrapper
 
 
 logger = logging.getLogger(__name__)
