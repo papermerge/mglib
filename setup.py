@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="mglib",
-    version="1.2.3",
+    version="1.2.4",
     author="Eugen Ciur",
     author_email="eugen@papermerge.com",
     url="https://github.com/papermerge/mglib",
@@ -21,5 +21,5 @@ setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.8',
+    python_requires='>=3.7',
 )

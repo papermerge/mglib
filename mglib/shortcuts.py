@@ -97,6 +97,8 @@ def extract_hocr(page_url, lang, media_root):
         "hocr"
     )
     run(cmd)
+    logger.debug(f"OCR for {page_url.img_url()} - Complete.")
+    logger.debug(f"OCR Result {page_url.hocr_url()}.")
 
 
 def extract_txt(page_url, lang, media_root):
