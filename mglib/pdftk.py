@@ -3,6 +3,8 @@ import logging
 from mglib.runcmd import run
 from mglib.pdfinfo import get_pagecount
 
+from .conf import settings
+
 logger = logging.getLogger(__name__)
 
 #
@@ -183,7 +185,7 @@ def paste_pages_into_existing_doc(
         )
 
     cmd = [
-        "pdftk",
+        settings.BINARY_PDFTK,
     ]
     # add A=doc1_path, B=doc2_path
     cmd.extend(letters_2_doc_map)
@@ -272,7 +274,7 @@ def paste_pages(
             )
 
     cmd = [
-        "pdftk",
+        settings.BINARY_PDFTK,
     ]
     # add A=doc1_path, B=doc2_path
     cmd.extend(letters_2_doc_map)
@@ -315,7 +317,7 @@ def reorder_pages(
     )
 
     cmd = [
-        "pdftk",
+        settings.BINARY_PDFTK,
         src,
         "cat"
     ]
@@ -338,7 +340,7 @@ def delete_pages(src, dst, page_numbers):
     )
 
     cmd = [
-        "pdftk",
+        settings.BINARY_PDFTK,
         src,
         "cat"
     ]

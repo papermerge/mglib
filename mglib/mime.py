@@ -1,13 +1,14 @@
 import logging
 from . import wrapper
 
+from .conf import settings
 
 logger = logging.getLogger(__name__)
 
 
 class Mime(wrapper.Wrapper):
     def __init__(self, filepath):
-        super().__init__(exec_name="file")
+        super().__init__(exec_name=settings.BINARY_FILE)
         self.filepath = filepath
 
     def get_cmd(self):

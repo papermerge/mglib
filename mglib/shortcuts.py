@@ -2,6 +2,7 @@ import os
 import logging
 
 from mglib.runcmd import run
+from .conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +29,7 @@ def resize_img(page_path, media_root):
         logger.debug(f"PPMROOT {ppmroot_dirname} already exists.")
 
     cmd = (
-        "convert",
+        settings.BINARY_CONVERT,
         "-resize",
         f"{width}x",
         local_abspath,
@@ -61,7 +62,7 @@ def extract_img(page_path, media_root):
     else:
         logger.debug(f"PPMROOT {ppmroot_dirname} already exists.")
     cmd = (
-        "pdftoppm",
+        settings.BINARY_PDFTOPPM,
         "-jpeg",
         "-f",
         str(page_num),
@@ -89,7 +90,7 @@ def extract_hocr(page_url, lang, media_root):
         os.path.join(media_root, page_url.hocr_url())
     )
     cmd = (
-        "tesseract",
+        settings.BINARY_OCR,
         "-l",
         lang,
         page_abspath,
@@ -112,37 +113,10 @@ def extract_txt(page_url, lang, media_root):
         )
     )
     cmd = (
-        "tesseract",
+        settings.BINARY_OCR,
         "-l",
         lang,
         page_abspath,
         txt_root
     )
     run(cmd)
-
-
-#def text_from_pdf(filepath, lang, dry_run=False):
-#
-#    # suffix .tiff in file name is required by conver utility, otherwise
-#    # it won't convert to tiff format!
-#    tiff = tempfile.NamedTemporaryFile(suffix=".tiff")
-#    conv = convert.Convert(dry_run=dry_run)
-#    conv(filepath=filepath, fout=tiff)
-#    try:
-#        tsact = tesseract.Tesseract()
-#        text = tsact(filepath=tiff.name, lang=lang)
-#    except subprocess.CalledProcessError as e:
-#        print(e)
-#        print(e.stderr)
-#        return
-#
-#    return text
-#
-#
-#def text_from_image(filepath, lang, dry_run=False):
-#
-#    tsact = tesseract.Tesseract(dry_run=dry_run)
-#    text = tsact(filepath=filepath, lang=lang)
-#
-#    return text
-#

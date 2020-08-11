@@ -3,6 +3,8 @@ import re
 import subprocess
 import logging
 
+from .conf import settings
+
 """
 Uses command line pdfinfo utility (from poppler pakage) for various
 small operations (e.g. get pdf page count).
@@ -13,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 def get_tiff_pagecount(filepath):
     cmd = [
-        "/usr/bin/identify",
+        settings.BINARY_IDENTIFY,
         "-format",
         "%n\n",
         filepath
@@ -76,10 +78,11 @@ def get_pagecount(filepath):
             "Only jpeg, png, pdf and tiff are handlerd by this"
             " method"
         )
-
     # pdfinfo "${PDFFILE}" | grep Pages
-
-    cmd = ["/usr/bin/pdfinfo", filepath]
+    cmd = [
+        settings.BINARY_PDFINFO,
+        filepath
+    ]
     compl = subprocess.run(
         cmd,
         stdout=subprocess.PIPE,

@@ -1,4 +1,13 @@
+
 # Changelog
+
+
+## [1.2.6] - 11 August 2020
+
+### Added
+
+- mglib.conf.settings module. The points it to get rid of hardcoded binary paths. Binary paths are now provided as configurations.
+
 
 ## [1.2.3] - 25 July 2020
 

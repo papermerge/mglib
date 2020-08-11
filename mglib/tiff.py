@@ -2,6 +2,7 @@ import os
 import logging
 
 from mglib.runcmd import run
+from .conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +22,7 @@ def convert_tiff2pdf(doc_url):
     )
 
     cmd = (
-        "convert",
+        settings.BINARY_CONVERT,
         doc_url,
         new_doc_url,
     )
