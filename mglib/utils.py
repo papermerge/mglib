@@ -44,7 +44,11 @@ def safe_to_delete(place):
         for name in files:
             base, ext = os.path.splitext(name)
             if ext not in SAFE_EXTENSIONS:
-                raise Exception("Trying to delete unsefe location")
+                logger.warning(
+                    f"Trying to delete unsefe location: "
+                    f"extention={ext} not found in {SAFE_EXTENSIONS}"
+                )
+                return False
 
     return True
 

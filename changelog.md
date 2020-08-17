@@ -1,6 +1,11 @@
 
 # Changelog
 
+## [1.2.7] - 17 August 2020
+
+### Changed
+
+- Do not raise exception when encoutering unsafe extention, log warning message instead.
 
 ## [1.2.6] - 11 August 2020
 
