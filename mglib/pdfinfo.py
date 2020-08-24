@@ -76,7 +76,7 @@ def get_pagecount(filepath):
 
     if ext and ext.lower() not in ('.pdf', '.tiff'):
         raise FileTypeNotSupported(
-            "Only jpeg, png, pdf and tiff are handlerd by this"
+            "Only jpeg, png, pdf and tiff are handled by this"
             " method"
         )
     # pdfinfo "${PDFFILE}" | grep Pages
