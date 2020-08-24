@@ -1,6 +1,13 @@
 
 # Changelog
 
+## [1.2.8] - 24 August 2020
+
+### Added
+
+- mglib.exceptions module introduced
+
+
 ## [1.2.7] - 17 August 2020
 
 ### Changed

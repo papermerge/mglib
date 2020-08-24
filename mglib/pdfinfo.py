@@ -4,6 +4,7 @@ import subprocess
 import logging
 
 from .conf import settings
+from .exceptions import FileTypeNotSupported
 
 """
 Uses command line pdfinfo utility (from poppler pakage) for various
@@ -74,7 +75,7 @@ def get_pagecount(filepath):
         return get_tiff_pagecount(filepath)
 
     if ext and ext.lower() not in ('.pdf', '.tiff'):
-        raise ValueError(
+        raise FileTypeNotSupported(
             "Only jpeg, png, pdf and tiff are handlerd by this"
             " method"
         )
