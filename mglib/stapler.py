@@ -300,4 +300,3 @@ def delete_pages(src, dst, page_numbers):
     cmd.append(dst)
 
     run(cmd)
-
