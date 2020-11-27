@@ -75,7 +75,7 @@ def get_pagecount(filepath):
     if mime_type == 'image/tiff':
         return get_tiff_pagecount(filepath)
 
-    if mime_type != 'application/pdf' :
+    if mime_type != 'application/pdf':
         raise FileTypeNotSupported(
             "Only jpeg, png, pdf and tiff are handled by this"
             " method"
