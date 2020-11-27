@@ -31,6 +31,8 @@ def cat_ranges_for_reorder(page_count, new_order):
 
         [4, 2, 3, 1]
     """
+    if len(new_order) != page_count:
+        raise ValueError("Not enough pages specified")
     results = []
     # key = page_num
     # value = page_order
@@ -53,7 +55,7 @@ def cat_ranges_for_delete(page_count, page_numbers):
     """
     Returns a list of integers. Each number in the list
     is the number of page which will 'stay' in document.
-    In other words, it returns a list with deleted pages.
+    In other words, it returns a list with not deleted pages.
 
     Examples:
 
@@ -83,7 +85,7 @@ def cat_ranges_for_delete(page_count, page_numbers):
 
     for check in page_numbers:
         if not isinstance(check, int):
-            err_msg = "page_numbers must be a list of strings"
+            err_msg = "page_numbers must be a list of ints"
             raise ValueError(err_msg)
 
     for number in range(1, page_count + 1):
@@ -112,7 +114,7 @@ def split_ranges(total, after=False, before=False):
     (it means, by default, all pages are inserted at the end of the doc)
     """
     if after and not before:
-        if not isinstance(after, int):
+        if not type(after) == int:
             raise ValueError(
                 "argument 'after' is supposed to be an int"
             )
@@ -121,7 +123,7 @@ def split_ranges(total, after=False, before=False):
         return list1, list2
 
     if not after and before:
-        if not isinstance(before, int):
+        if not type(before) == int:
             raise ValueError(
                 "argument 'before' is supposed to be an int"
             )
