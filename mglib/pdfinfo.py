@@ -2,6 +2,7 @@ import os
 import re
 import subprocess
 import logging
+from magic import from_file
 
 from .conf import settings
 from .exceptions import FileTypeNotSupported
@@ -63,18 +64,18 @@ def get_pagecount(filepath):
     if os.path.isdir(filepath):
         raise ValueError("Filepath %s is a directory!" % filepath)
 
-    base, ext = os.path.splitext(filepath)
+    mime_type = from_file(filepath, mime=True)
 
     # pure images (png, jpeg) have only one page :)
-    if ext and ext.lower() in ('.jpeg', '.png', '.jpg'):
+    if mime_type in ['image/png', 'image/jpeg', 'image/jpg']:
         # whatever png/jpg image is there - it is
         # considered by default one page document.
         return 1
 
-    if ext and ext.lower() in ('.tiff', ):
+    if mime_type == 'image/tiff':
         return get_tiff_pagecount(filepath)
 
-    if ext and ext.lower() not in ('.pdf', '.tiff'):
+    if mime_type != 'application/pdf':
         raise FileTypeNotSupported(
             "Only jpeg, png, pdf and tiff are handled by this"
             " method"
