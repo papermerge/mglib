@@ -11,3 +11,8 @@ Python Package containing modules shared across all [Papermerge Project](https:/
 ## Run tests
 
     python test/run.py
+
+
+## Requirements
+
+    python >= 3.7
