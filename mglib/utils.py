@@ -87,7 +87,7 @@ def get_assigns_after_delete(total_pages, deleted_pages):
     ]
     """
     if total_pages < len(deleted_pages):
-        err_msg = f"total_pages < deleted_pages"
+        err_msg = "total_pages < deleted_pages"
         raise ValueError(err_msg)
 
     # only numbers of pages which were not deleted
@@ -136,7 +136,7 @@ def try_load_config(config_locations, config_env_var_name):
             try:
                 cfg_papermerge, cfg_file_found = load_config(config_file)
             except FileNotFoundError:
-                err_msg = f"Failed attempted to read" +\
+                err_msg = "Failed attempted to read" +\
                     f" configuration file '{config_file}'" +\
                     f" pointed by environment variable '{config_env_var_name}'"
                 raise FileNotFoundError(err_msg)

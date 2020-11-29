@@ -285,8 +285,6 @@ def reorder_pages(
 
 
 def delete_pages(src, dst, page_numbers):
-    page_count = get_pagecount(src)
-
     cmd = [
         settings.BINARY_STAPLER,
         "del",
