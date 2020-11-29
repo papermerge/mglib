@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="mglib",
-    version="1.2.8",
+    version="1.3.0",
     author="Eugen Ciur",
     author_email="eugen@papermerge.com",
     url="https://github.com/papermerge/mglib",
