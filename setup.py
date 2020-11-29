@@ -14,7 +14,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     license="Apache 2.0 License",
-    keywords="common, pacakge, shared, papermerge",
+    keywords="common, package, shared, papermerge, pdf, ocr, dms",
     packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
