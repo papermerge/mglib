@@ -23,10 +23,6 @@ BINARY_IDENTIFY = "/usr/bin/identify"
 # Used to extract text from images/PDF files.
 BINARY_OCR = "/usr/bin/tesseract"
 
-# Provided by pdftk package
-# Used to reorder, cut/paste, delete pages withing PDF document
-BINARY_PDFTK = "/usr/bin/pdftk"
-
 # Provided by stapler
 # Used to edit PDF documents
 BINARY_STAPLER = "~/.local/bin/stapler"

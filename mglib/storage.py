@@ -4,7 +4,7 @@ import shutil
 from os import listdir
 from os.path import isdir, join
 
-from mglib import pdftk
+from mglib import stapler
 from mglib.path import DocumentPath, PagePath
 from mglib.step import Steps
 from mglib.utils import get_assigns_after_delete, safe_to_delete
@@ -209,7 +209,7 @@ class Storage:
             self.abspath(dst_doc_path)
         )
 
-        pdftk.reorder_pages(
+        stapler.reorder_pages(
             src=self.abspath(src_doc_path),
             dst=self.abspath(dst_doc_path),
             new_order=new_order
@@ -269,7 +269,7 @@ class Storage:
         self.make_sure_path_exists(
             self.abspath(dst_doc_path)
         )
-        pdftk.delete_pages(
+        stapler.delete_pages(
             self.abspath(src_doc_path),
             self.abspath(dst_doc_path),
             page_numbers
@@ -332,7 +332,7 @@ class Storage:
             self.abspath(next_ver_dp)
         )
 
-        pdftk.paste_pages(
+        stapler.paste_pages(
             src=self.abspath(dest_doc_path),
             dst=self.abspath(next_ver_dp),
             data_list=data_list,
