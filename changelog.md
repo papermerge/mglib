@@ -1,6 +1,13 @@
 
 # Changelog
 
+## [1.3.1] - 1 December 2020
+
+### Changed
+
+- pdftk module was replaced with stapler
+
+
 ## [1.2.8] - 24 August 2020
 
 ### Added
