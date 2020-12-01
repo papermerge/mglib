@@ -64,22 +64,42 @@ def get_pagecount(filepath):
     if os.path.isdir(filepath):
         raise ValueError("Filepath %s is a directory!" % filepath)
 
+    base, ext = os.path.splitext(filepath)
     mime_type = from_file(filepath, mime=True)
-
     # pure images (png, jpeg) have only one page :)
+
     if mime_type in ['image/png', 'image/jpeg', 'image/jpg']:
         # whatever png/jpg image is there - it is
         # considered by default one page document.
         return 1
 
+    # In case of REST API upload (via PUT + form multipart)
+    # django saves temporary file as application/octet-stream
+    # Checking extentions is an extra method of finding out correct
+    # mime type
+    if ext and ext.lower() in ('.jpeg', '.png', '.jpg'):
+        return 1
+
     if mime_type == 'image/tiff':
         return get_tiff_pagecount(filepath)
 
+    # In case of REST API upload (via PUT + form multipart)
+    # django saves temporary file as application/octet-stream
+    # Checking extentions is an extra method of finding out correct
+    # mime type
+    if ext and ext.lower() in ('.tiff', ):
+        return get_tiff_pagecount(filepath)
+
     if mime_type != 'application/pdf':
-        raise FileTypeNotSupported(
-            "Only jpeg, png, pdf and tiff are handled by this"
-            " method"
-        )
+        # In case of REST API upload (via PUT + form multipart)
+        # django saves temporary file as application/octet-stream
+        # Checking extentions is an extra method of finding out correct
+        # mime type
+        if ext and ext.lower() != '.pdf':
+            raise FileTypeNotSupported(
+                "Only jpeg, png, pdf and tiff are handled by this"
+                " method"
+            )
     # pdfinfo "${PDFFILE}" | grep Pages
     cmd = [
         settings.BINARY_PDFINFO,

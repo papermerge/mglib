@@ -1,6 +1,12 @@
 
 # Changelog
 
+## [1.3.2] - 1 December 2020
+
+### Changed
+
+ - mglib.pdfinfo.get_pagecount use python magic + file extention to determine correct mime type (and thus page count)
+
 ## [1.3.1] - 1 December 2020
 
 ### Changed
