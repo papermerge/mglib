@@ -32,12 +32,16 @@ class DocumentPath:
         self.version = version
         self.pages = "pages"
 
-    def url(self):
-        return f"{self.dirname}{self.file_name}"
+    def url(self, version=None):
+        if version:
+            version = int(version)
 
-    @property
-    def path(self):
-        return self.url()
+        return f"{self.dirname(version=version)}{self.file_name}"
+
+    def path(self, version=None):
+        if version:
+            version = int(version)
+        return self.url(version=version)
 
     @property
     def dirname_docs(self):
@@ -57,21 +61,23 @@ class DocumentPath:
 
         return _path
 
-    @property
-    def dirname(self):
+    def dirname(self, version=None):
+
+        if version is None:
+            version = self.version
+
         full_path = (
             f"{self.aux_dir}/user_{self.user_id}/"
             f"document_{self.document_id}/"
         )
 
-        if self.version > 0:
-            full_path = f"{full_path}v{self.version}/"
+        if version > 0:
+            full_path = f"{full_path}v{version}/"
 
         return full_path
 
-    @property
-    def pages_dirname(self):
-        return f"{self.dirname}{self.pages}/"
+    def pages_dirname(self, version=None):
+        return f"{self.dirname(version=version)}{self.pages}/"
 
     def __repr__(self):
         message = (
@@ -144,7 +150,7 @@ class PagePath:
     @property
     def ppmroot(self):
         # returns schema://.../<doc_id>/pages/<page_num>/<step>/page
-        pages_dirname = self.results_document_ep.pages_dirname
+        pages_dirname = self.results_document_ep.pages_dirname()
         result = (
             f"{pages_dirname}page_{self.page_num}/"
             f"{self.step.percent}/page"
@@ -153,7 +159,7 @@ class PagePath:
 
     @property
     def pages_dirname(self):
-        return self.document_path.pages_dirname
+        return self.document_path.pages_dirname()
 
     @property
     def path(self):
@@ -167,7 +173,7 @@ class PagePath:
         return self.txt_url()
 
     def txt_url(self):
-        pages_dirname = self.results_document_ep.pages_dirname
+        pages_dirname = self.results_document_ep.pages_dirname()
         return f"{pages_dirname}page_{self.page_num}.txt"
 
     @property
