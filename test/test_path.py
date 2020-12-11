@@ -19,6 +19,47 @@ class TestDocumentPath(unittest.TestCase):
             "docs/user_1/document_3/x.pdf"
         )
 
+    def test_document_url_with_another_version(self):
+
+        doc_ep = DocumentPath(
+            user_id=1,
+            document_id=15,
+            file_name="x.pdf"
+        )
+        self.assertEqual(
+            doc_ep.url(version=3),
+            "docs/user_1/document_15/v3/x.pdf"
+        )
+
+        self.assertEqual(
+            doc_ep.url(version=2),
+            "docs/user_1/document_15/v2/x.pdf"
+        )
+
+    def test_document_url_none_vs_0(self):
+        doc_ep = DocumentPath(
+            user_id=1,
+            document_id=15,
+            file_name="x.pdf"
+        )
+        doc_ep.inc_version()  # current version = 1
+        doc_ep.inc_version()  # current version = 2
+        doc_ep.inc_version()  # current version = 3
+
+        self.assertEqual(
+            # with version == None, latest version of the document
+            # will be returned, which is 3
+            doc_ep.url(version=None),
+            "docs/user_1/document_15/v3/x.pdf"
+        )
+
+        self.assertEqual(
+            # with version == 0, version 0 will be provided
+            # i.e. version=0 returns original doc.
+            doc_ep.url(version=0),
+            "docs/user_1/document_15/x.pdf"
+        )
+
     def test_inc_version(self):
         """
         Document endpoints are now versioned.
@@ -48,6 +89,13 @@ class TestDocumentPath(unittest.TestCase):
             "docs/user_1/document_3/v2/x.pdf"
         )
 
+        # however, explicit version can be forced
+        # by providing an argument to url method.
+        self.assertEqual(
+            doc_ep.url(version=1),
+            "docs/user_1/document_3/v1/x.pdf"
+        )
+
     def test_dirname(self):
         ep = DocumentPath(
             user_id=1,
@@ -56,7 +104,7 @@ class TestDocumentPath(unittest.TestCase):
             file_name="x.pdf"
         )
         self.assertEqual(
-            ep.dirname,
+            ep.dirname(),
             "results/user_1/document_3/"
         )
 
@@ -68,7 +116,7 @@ class TestDocumentPath(unittest.TestCase):
             file_name="x.pdf"
         )
         self.assertEqual(
-            ep.pages_dirname,
+            ep.pages_dirname(),
             "results/user_1/document_3/pages/"
         )
 
