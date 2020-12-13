@@ -44,7 +44,7 @@ class Storage:
         doc_path_pointing_to_results = DocumentPath.copy_from(
             doc_path, aux_dir="results"
         )
-        pages_dir = self.abspath(doc_path_pointing_to_results.pages_dirname)
+        pages_dir = self.abspath(doc_path_pointing_to_results.pages_dirname())
 
         only_dirs = [
             fi for fi in listdir(pages_dir) if isdir(join(pages_dir, fi))
