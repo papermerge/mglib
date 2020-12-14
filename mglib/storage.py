@@ -51,11 +51,19 @@ class Storage:
         abs_dirname_docs = self.path(
             doc_path.dirname_docs
         )
-        only_dirs = [
-            fi for fi in listdir(abs_dirname_docs) if isdir(
-                join(abs_dirname_docs, fi)
-            )
-        ]
+        try:
+            only_dirs = [
+                fi for fi in listdir(abs_dirname_docs) if isdir(
+                    join(abs_dirname_docs, fi)
+                )
+            ]
+        except FileNotFoundError:
+            # in tests, document folders are not always created.
+            # If no document folder is found, just return [ 0 ]
+            # i.e that document has only one single version and it
+            # is the latest one.
+            return [0]
+
         dirs_count = len(only_dirs)
 
         return list(range(0, dirs_count + 1))

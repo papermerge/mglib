@@ -1,6 +1,13 @@
 
 # Changelog
 
+## [1.3.5] - 14 December 2020
+
+### Changed
+
+- bug fixing of get_versions method
+
+
 ## [1.3.4] - 14 December 2020
 
 ### Changed
