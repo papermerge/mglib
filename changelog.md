@@ -1,6 +1,12 @@
 
 # Changelog
 
+## [1.3.4] - 14 December 2020
+
+### Changed
+
+- mglib.storage.get_versions(self, doc_path) method added
+
 ## [1.3.3] - 14 December 2020
 
 ### Changed

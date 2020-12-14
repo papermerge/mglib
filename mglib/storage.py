@@ -35,6 +35,31 @@ class Storage:
             exist_ok=True
         )
 
+    def get_versions(self, doc_path):
+        """
+        Returns a list of (all) ordered versions
+        of specific doc_path. Versions
+        start with 0. Examples of return values:
+
+        - [0, 1, 2, 3] = 4 versions of the document
+        - [ 0 ] = only one version (original)
+
+        To count versions it just counts number of subfolders
+        in specific document folder. Versions are
+        stored in subfolders named v1, v2, v3, ...
+        """
+        abs_dirname_docs = self.path(
+            doc_path.dirname_docs
+        )
+        only_dirs = [
+            fi for fi in listdir(abs_dirname_docs) if isdir(
+                join(abs_dirname_docs, fi)
+            )
+        ]
+        dirs_count = len(only_dirs)
+
+        return list(range(0, dirs_count + 1))
+
     def get_pagecount(self, doc_path):
         """
         Returns total number of pages for this doc_path.
