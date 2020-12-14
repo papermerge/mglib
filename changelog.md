@@ -1,6 +1,13 @@
 
 # Changelog
 
+## [1.3.3] - 14 December 2020
+
+### Changed
+
+- mglib.path module adjusted to accept version argument. Supports
+    getting/setting path to versioned documents.
+
 ## [1.3.2] - 1 December 2020
 
 ### Changed
