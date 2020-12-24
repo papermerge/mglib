@@ -43,7 +43,7 @@ def safe_to_delete(place):
     for root, dirs, files in os.walk(place):
         for name in files:
             base, ext = os.path.splitext(name)
-            if ext not in SAFE_EXTENSIONS:
+            if ext.lower() not in SAFE_EXTENSIONS:
                 logger.warning(
                     f"Trying to delete unsefe location: "
                     f"extention={ext} not found in {SAFE_EXTENSIONS}"
