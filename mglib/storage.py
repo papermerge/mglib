@@ -27,10 +27,10 @@ class Storage:
     def location(self):
         return self._location
 
-    def upload(self, doc_path, **kwargs):
+    def upload(self, doc_path_url, **kwargs):
         pass
 
-    def download(self, doc_path, **kwargs):
+    def download(self, doc_path_url, **kwargs):
         pass
 
     def make_sure_path_exists(self, filepath):
@@ -165,24 +165,60 @@ class Storage:
             self.path(_path)
         )
 
-    def copy_page(self, src_page_path, dst_page_path):
-        err_msg = "copy_page accepts only PageEp instances"
+    def copy_page_txt(self, src_page_path, dst_page_path):
 
+        self.make_sure_path_exists(
+            self.abspath(dst_page_path.txt_url())
+        )
+
+        src_txt = self.abspath(src_page_path.txt_url())
+        dst_txt = self.abspath(dst_page_path.txt_url())
+
+        logger.debug(f"copy src_txt={src_txt} dst_txt={dst_txt}")
+        shutil.copy(src_txt, dst_txt)
+
+    def copy_page_img(self, src_page_path, dst_page_path):
+
+        self.make_sure_path_exists(
+            self.abspath(dst_page_path.img_url())
+        )
+
+        src_img = self.abspath(src_page_path.img_url())
+        dst_img = self.abspath(dst_page_path.img_url())
+        logger.debug(f"copy src_img={src_img} dst_img={dst_img}")
+        shutil.copy(src_img, dst_img)
+
+    def copy_page_hocr(self, src_page_path, dst_page_path):
+
+        self.make_sure_path_exists(
+            self.abspath(dst_page_path.hocr_url())
+        )
+
+        src_hocr = self.abspath(src_page_path.hocr_url())
+        dst_hocr = self.abspath(dst_page_path.hocr_url())
+        logger.debug(f"copy src_hocr={src_hocr} dst_hocr={dst_hocr}")
+        shutil.copy(src_hocr, dst_hocr)
+
+    def copy_page(self, src_page_path, dst_page_path):
+        """
+        Copies page data from source to destination.
+
+        Page data are files with following extentions:
+            * txt
+            * hocr
+            * jpeg
+        they are located in media root of respective application.
+        """
         for inst in [src_page_path, dst_page_path]:
             if not isinstance(inst, PagePath):
-                raise ValueError(err_msg)
+                raise ValueError("copy_page accepts only PagePath instances")
 
         # copy .txt file
         if self.exists(src_page_path.txt_url()):
-
-            self.make_sure_path_exists(
-                self.abspath(dst_page_path.txt_url())
+            self.copy_page_txt(
+                src_page_path=src_page_path,
+                dst_page_path=dst_page_path
             )
-
-            src_txt = self.abspath(src_page_path.txt_url())
-            dst_txt = self.abspath(dst_page_path.txt_url())
-            logger.debug(f"copy src_txt={src_txt} dst_txt={dst_txt}")
-            shutil.copy(src_txt, dst_txt)
         else:
             logger.debug(
                 f"txt does not exits {src_page_path.txt_url()}"
@@ -190,28 +226,20 @@ class Storage:
 
         # hocr
         if self.exists(src_page_path.hocr_url()):
-            self.make_sure_path_exists(
-                self.abspath(dst_page_path.hocr_url())
+            self.copy_page_hocr(
+                src_page_path=src_page_path,
+                dst_page_path=dst_page_path
             )
-
-            src_hocr = self.abspath(src_page_path.hocr_url())
-            dst_hocr = self.abspath(dst_page_path.hocr_url())
-            logger.debug(f"copy src_hocr={src_hocr} dst_hocr={dst_hocr}")
-            shutil.copy(src_hocr, dst_hocr)
         else:
             logger.debug(
                 f"hocr does not exits {src_page_path.hocr_url()}"
             )
 
         if src_page_path.img_url():
-            self.make_sure_path_exists(
-                self.abspath(dst_page_path.img_url())
+            self.copy_page_img(
+                src_page_path=src_page_path,
+                dst_page_path=dst_page_path
             )
-
-            src_img = self.abspath(src_page_path.img_url())
-            dst_img = self.abspath(dst_page_path.img_url())
-            logger.debug(f"copy src_img={src_img} dst_img={dst_img}")
-            shutil.copy(src_img, dst_img)
         else:
             logger.debug(
                 f"img does not exits {src_page_path.img_url()}"
