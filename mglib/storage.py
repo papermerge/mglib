@@ -18,7 +18,7 @@ class Storage:
     on local host filesystem
     """
 
-    def __init__(self, location=None):
+    def __init__(self, location=None, **kwargs):
         # by default, this will be something like
         # settings.MEDIA_ROOT
         self._location = location
@@ -26,6 +26,12 @@ class Storage:
     @property
     def location(self):
         return self._location
+
+    def upload(self, doc_path, **kwargs):
+        pass
+
+    def download(self, doc_path, **kwargs):
+        pass
 
     def make_sure_path_exists(self, filepath):
         logger.debug(f"make_sure_path_exists {filepath}")
