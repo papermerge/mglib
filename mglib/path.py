@@ -199,7 +199,7 @@ class PagePath:
             fmt_num = "{num:d}"
         elif self.page_count > 9 and self.page_count < 100:
             fmt_num = "{num:02d}"
-        elif self.page_count > 100:
+        elif self.page_count >= 100:
             fmt_num = "{num:003d}"
 
         return fmt_num.format(
