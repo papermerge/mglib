@@ -26,6 +26,7 @@ def pdfname_from_tiffname(doc_url):
 
     return new_doc_url, f"{base_root}.pdf"
 
+
 def convert_tiff2pdf(doc_url):
 
     logger.debug(f"convert_tiff2pdf for {doc_url}")
