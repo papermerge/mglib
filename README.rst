@@ -1,18 +1,24 @@
+=======
 MgLib
 =======
 
 Python Package containing modules shared across all [Papermerge Project](https://github.com/ciur/papermerge) project.
 
-## Installation
+##############
+Installation
+##############
 
     pip install mglib
 
-
-## Run tests
+###########
+Run tests
+###########
 
     python test/run.py
 
 
-## Requirements
+##############
+Requirements
+##############
 
     python >= 3.7
