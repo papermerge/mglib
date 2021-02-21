@@ -137,7 +137,7 @@ class Storage:
             if os.path.exists(abs_dirname_results):
                 os.rmdir(abs_dirname_results)
 
-    def copy_doc(self, src, dst):
+    def copy_doc(self, src: DocumentPath, dst: DocumentPath):
         """
         copy given file src file path to destination
         as absolute doc_path
@@ -156,7 +156,7 @@ class Storage:
             f"copy_doc: {src} to {dst}"
         )
         shutil.copyfile(
-            src,
+            self.abspath(src),
             self.abspath(dst)
         )
 
