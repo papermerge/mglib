@@ -21,3 +21,16 @@ class TestConvert(unittest.TestCase):
         self.assertTrue(
             mime_type.is_pdf()
         )
+
+    def test_get_mime_type(self):
+
+        file_path = os.path.join(
+            DATA_DIR,
+            "berlin.pdf"
+        )
+        mime_type = mime.Mime(filepath=file_path)
+
+        self.assertEquals(
+            mime_type.guess(),
+            "application/pdf"
+        )
