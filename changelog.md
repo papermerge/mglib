@@ -1,6 +1,10 @@
 
 # Changelog
 
+## [1.3.8] - 4 March 2020
+
+- bug fix: reset version to 0 for newly created documents "from paste"
+
 ## [1.3.5] - 14 December 2020
 
 ### Changed

@@ -391,9 +391,17 @@ class Storage:
         from src_doc_path. Both dest and src are instances of
         mglib.path.DocumentPath
         """
+        next_version = 0
+        if dest_doc_is_new:
+            # document is new, start version with 0
+            next_version = 0
+        else:
+            # destination document is not new, increment its version
+            next_version = dest_doc_path.version + 1
+
         next_ver_dp = DocumentPath.copy_from(
             dest_doc_path,
-            version=dest_doc_path.version + 1
+            version=next_version
         )
         self.make_sure_path_exists(
             self.abspath(next_ver_dp)
@@ -448,7 +456,7 @@ class Storage:
                     )
                 dest_page_num += 1
 
-        return dest_doc_path.version + 1
+        return next_version
 
 
 class FileSystemStorage(Storage):
