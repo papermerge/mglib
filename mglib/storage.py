@@ -33,6 +33,9 @@ class Storage:
     def download(self, doc_path_url, **kwargs):
         pass
 
+    def _s3copy(self, src, dst):
+        pass
+
     def make_sure_path_exists(self, filepath):
         logger.debug(f"make_sure_path_exists {filepath}")
         dirname = os.path.dirname(filepath)

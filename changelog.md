@@ -1,6 +1,10 @@
 
 # Changelog
 
+## [1.3.9] - 2021-09-19
+### Added
+- empty \_s3copy method to meglib.storage.Storage class
+
 ## [1.3.8] - 4 March 2020
 
 - bug fix: reset version to 0 for newly created documents "from paste"
